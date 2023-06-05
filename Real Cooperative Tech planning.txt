@@ -1,0 +1,60 @@
+Real Cooperative Tech planning
+
+Needed Tech
+Node.js
+-Database
+    -Document based?
+    -Relational?
+    -Graph?
+        -Fauna or SurrealDB
+Bucket for files
+
+Data models
+
+Communities
+    Community.id
+    Stories: URL || HTML[]
+    Recipes: Recipe.id
+    Ancestor Communities: Community.id
+    Locations: Location.id
+    Spiritual Expression
+    Political
+    Images: URL[]
+    Medicine
+    Economic
+    Language: Language.id
+
+Language
+    Name
+    Dialects []
+    Language.id
+
+Location
+    Plants: plants.id[]
+    GIS/Coordinates
+    Community: Community.id[]
+
+Recipe
+    Recipe.id
+    Name
+    Images: URL[]
+    Plain Text: HTML
+    Ingredients: String[]
+    Methods: String[]
+    Tags: String[]
+
+Plants
+    Plant.id
+    Locations
+    Common Name
+    Alternative Names
+    Latin Names
+
+Medicine
+    Plants Plant.id[]
+
+Spiritual Expression
+    Plants: Plant.id
+
+
+
