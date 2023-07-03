@@ -1,3 +1,12 @@
+GET http://localhost:4000/get
+Content-Type: application/json
+
+{
+    "id": "recipe:black_eyed_peas"
+}
+
+
+###
 POST http://localhost:4000/post
 Content-Type: application/json
 
