@@ -2,12 +2,12 @@ GET http://localhost:4000/get
 Content-Type: application/json
 
 {
-    "id": "recipe:black_eyed_peas"
+    "id": "recipe"
 }
 
 
 ###
-POST http://localhost:4000/post
+GET http://localhost:4000/post
 Content-Type: application/json
 
 {
@@ -66,12 +66,6 @@ Content-Type: application/json
         },
         {
             "description": "Add Black Eyed Peas"
-        }
-    ],
-    "attachments": [
-        {
-            "name": "Black Eyed Peas.png",
-            "data": "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII"
         }
     ]
 }

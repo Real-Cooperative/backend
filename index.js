@@ -42,17 +42,31 @@ if (cluster.isPrimary) {
 
     const routes = {
         '/post': async function post_route (req, res) {
-            req.on('data', async (data) => {
-                const body = JSON.parse(data);
-                post(body);
+            let body = {};
+            req.on( 'error', (err) => {
+                console.error(err);
+            }).on('data', async (data) => {
+                body = JSON.parse(data);
+            }).on('end', async () => {
+                res.on('error', (err) => {
+                    console.error(err);
+                });
+                const msg = await post(body);
+                res.end(JSON.stringify(msg));
             });
-            res.end(JSON.stringify({ message: 'Success' }));
         },
         '/get': async function get_route (req, res) {
-            req.on('data', async (data) => {
-                const body = JSON.parse(data);
-                const response = await get(body);
-                res.end(JSON.stringify(response));
+            let body = {};
+            req.on( 'error', (err) => {
+                console.error(err);
+            }).on('data', async (data) => {
+                body = JSON.parse(data);
+            }).on('end', async () => {
+                res.on('error', (err) => {
+                    console.error(err);
+                });
+                const msg = await get(body);
+                res.end(JSON.stringify(msg));
             });
         },
         '/upload': async function upload_route (req, res) {
