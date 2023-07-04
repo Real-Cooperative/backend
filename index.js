@@ -70,19 +70,24 @@ if (cluster.isPrimary) {
             });
         },
         '/upload': async function upload_route (req, res) {
-            const form = formidable({});
-            const { fields, files } = await new Promise((resolve, reject) => {
-                form.parse(req, (err, fields, files) => {
-                    if (err) reject(err);
-                    resolve({ fields, files });
+            try {
+                const form = formidable({});
+                const { fields, files } = await new Promise((resolve, reject) => {
+                    form.parse(req, (err, fields, files) => {
+                        if (err) reject(err);
+                        resolve({ fields, files });
+                    });
                 });
-            });
-            const oldpath = files.attachment[0].filepath;
-            const newpath = `./assets/attachments/${encodeURIComponent(files.attachment[0].originalFilename)}`;
-            fs.rename(oldpath, newpath, function (err) {
-                if (err) res.end(err);
-                res.end(`${process.env.SERVER_URL}${newpath.slice(1)}`);
-            });
+                const oldpath = files.attachment[0].filepath;
+                const newpath = `./assets/attachments/${encodeURIComponent(files.attachment[0].originalFilename)}`;
+                fs.rename(oldpath, newpath, function (err) {
+                    if (err) res.end(err);
+                    res.end(`${process.env.SERVER_URL}${newpath.slice(1)}`);
+                });
+            } catch(e) {
+                res.end(`Error: ${e.message}`);
+            }
+            
         },
     }
 
