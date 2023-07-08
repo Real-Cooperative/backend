@@ -11,6 +11,7 @@ import fs from "fs";
 import path from "path";
 import { externalRequest as post } from "./routes/post.js";
 import { externalRequest as get } from "./routes/get.js";
+import { login, signup } from "./routes/user.js";
 
 import dotenv from "dotenv";
 
@@ -39,6 +40,39 @@ if (cluster.isPrimary) {
     });
 } else {
     const routes = {
+        "/login": async function login_route(req, res) {
+            let body = {};
+            req.on("error", (err) => {
+                console.log(err);
+            })
+                .on("data", async (data) => {
+                    body = JSON.parse(data);
+                })
+                .on("end", async () => {
+                    res.on("error", (err) => {
+                        console.error(err);
+                    });
+                    const msg = await login(body);
+                    console.log(msg);
+                    res.end(JSON.stringify(msg));
+                });
+        },
+        "/signup": async function signup_route(req, res) {
+            let body = {};
+            req.on("error", (err) => {
+                console.log(err);
+            })
+                .on("data", async (data) => {
+                    body = JSON.parse(data);
+                })
+                .on("end", async () => {
+                    res.on("error", (err) => {
+                        console.error(err);
+                    });
+                    const msg = await signup(body);
+                    res.end(JSON.stringify(msg));
+                });
+        },
         "/post": async function post_route(req, res) {
             let body = {};
             req.on("error", (err) => {
