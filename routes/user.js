@@ -17,13 +17,15 @@ function hmacSHA256(password, salt) {
 }
 
 async function login(req) {
-    const { email, password } = req;
+    const { username, password } = req;
 
-    if (email && password) {
-        const data = `email: ${email}, password: ${password}`;
+    if (username && password) {
+        const data = `user: ${username}, password: ${password}`;
         await db.signin({ user: "root", pass: "root" });
         await db.use({ ns: "test", db: "test" });
-        const userData = await db.query(`SELECT * FROM user:⟨${email}⟩`);
+        const userData = await db.query(
+            `SELECT * FROM user WHERE user = "${username}"`
+        );
         if (userData) {
             const { salt } = userData[0].result[0];
 
@@ -35,7 +37,7 @@ async function login(req) {
                     NS: "test",
                     DB: "test",
                     SC: "allusers",
-                    id: email,
+                    user: username,
                     pass: hash,
                 });
                 return { status: "OK", token, message: "Signed in" };
@@ -53,31 +55,31 @@ async function login(req) {
 }
 
 async function signup(req) {
-    const { username, password, email, marketing } = req;
+    const { username, password, email, settings } = req;
 
     if (email && password) {
-        const data = `email: ${email}, password: ${password}`;
-        const salt = crypto.randomBytes(128).toString("base64");
-        const hash = hmacSHA256(data, salt).toString();
+        try {
+            const data = `user: ${username}, password: ${password}`;
+            const salt = crypto.randomBytes(64).toString("base64");
+            const hash = hmacSHA256(data, salt).toString();
+            const time = new Date().toISOString();
 
-        const token = await db.signup({
-            NS: "test",
-            DB: "test",
-            SC: "allusers",
-            id: email,
-            pass: hash,
-        });
+            const token = await db.signup({
+                NS: "test",
+                DB: "test",
+                SC: "allusers",
+                email: email,
+                pass: hash,
+                user: username,
+                salt: salt,
+                settings: settings,
+                created: time,
+            });
 
-        await db.signin({ user: "root", pass: "root" });
-        await db.use({ ns: "test", db: "test" });
-
-        await db.merge(`user:⟨${email}⟩`, {
-            user: username,
-            salt: salt,
-            marketing: marketing,
-        });
-
-        return token;
+            return { status: "OK", token, message: "Registered" };
+        } catch (e) {
+            return { status: "Error", token: null, message: e.message };
+        }
     } else {
         return "Please provide a valid username and password";
     }
