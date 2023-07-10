@@ -83,4 +83,29 @@ async function signup(req) {
     }
 }
 
-export { login, signup };
+async function getMe(req) {
+    const { token, username } = req;
+    try {
+        await db.authenticate(token);
+
+        let query = await db.query(
+            `SELECT *, "" as pass, "" as salt FROM user WHERE user = "${username}"`
+        );
+
+        let details = query[0].result[0];
+
+        Object.keys(details).forEach(
+            (key) => details[key] === "" && delete details[key]
+        );
+
+        return {
+            status: "OK",
+            details: details,
+            message: "Success",
+        };
+    } catch (e) {
+        return { status: "Error", details: null, message: e.message };
+    }
+}
+
+export { login, signup, getMe };
