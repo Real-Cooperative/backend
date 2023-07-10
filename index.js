@@ -6,14 +6,15 @@ import cluster from "cluster";
 import os from "os";
 
 import url from "url";
-import formidable from "formidable";
 import fs from "fs";
 import path from "path";
 import { externalRequest as post } from "./routes/post.js";
 import { externalRequest as get } from "./routes/get.js";
-import { login, signup } from "./routes/user.js";
+import { getMe, login, signup } from "./routes/user.js";
 
 import dotenv from "dotenv";
+import { use } from "./methods/use.js";
+import { upload } from "./routes/upload.js";
 
 dotenv.config();
 
@@ -40,106 +41,12 @@ if (cluster.isPrimary) {
     });
 } else {
     const routes = {
-        "/login": async function login_route(req, res) {
-            let body = {};
-            req.on("error", (err) => {
-                console.log(err);
-            })
-                .on("data", async (data) => {
-                    body = JSON.parse(data);
-                })
-                .on("end", async () => {
-                    res.on("error", (err) => {
-                        console.error(err);
-                    });
-                    const msg = await login(body);
-                    console.log(msg);
-                    res.end(JSON.stringify(msg));
-                });
-        },
-        "/signup": async function signup_route(req, res) {
-            let body = {};
-            req.on("error", (err) => {
-                console.log(err);
-            })
-                .on("data", async (data) => {
-                    body = JSON.parse(data);
-                })
-                .on("end", async () => {
-                    res.on("error", (err) => {
-                        console.error(err);
-                    });
-                    const msg = await signup(body);
-                    res.end(JSON.stringify(msg));
-                });
-        },
-        "/post": async function post_route(req, res) {
-            let body = {};
-            req.on("error", (err) => {
-                console.error(err);
-            })
-                .on("data", async (data) => {
-                    body = JSON.parse(data);
-                })
-                .on("end", async () => {
-                    res.on("error", (err) => {
-                        console.error(err);
-                    });
-                    const msg = await post(body);
-                    res.end(JSON.stringify(msg));
-                });
-        },
-        "/get": async function get_route(req, res) {
-            let body = {};
-            req.on("error", (err) => {
-                console.error(err);
-            })
-                .on("data", async (data) => {
-                    body = JSON.parse(data);
-                })
-                .on("end", async () => {
-                    res.on("error", (err) => {
-                        console.error(err);
-                    });
-                    const msg = await get(body);
-                    res.end(JSON.stringify(msg));
-                });
-        },
-        "/upload": async function upload_route(req, res) {
-            try {
-                const form = formidable({});
-                const { fields, files } = await new Promise(
-                    (resolve, reject) => {
-                        form.parse(req, (err, fields, files) => {
-                            if (err) reject(err);
-                            resolve({ fields, files });
-                        });
-                    }
-                );
-                const oldpath = files.attachment[0].filepath;
-                const folderName = "./assets/attachments/";
-                let newpath =
-                    folderName +
-                    encodeURIComponent(files.attachment[0].originalFilename);
-                if (!fs.existsSync(folderName)) {
-                    fs.mkdirSync(folderName);
-                }
-
-                if (fs.existsSync(newpath)) {
-                    const ext = path.parse(newpath).ext;
-                    const name = path.parse(newpath).name;
-                    const now = Date.now();
-                    newpath = `${folderName}${name}_${now}${ext}`;
-                }
-
-                fs.rename(oldpath, newpath, function (err) {
-                    if (err) res.end(err);
-                    res.end(`${process.env.SERVER_URL}${newpath.slice(1)}`);
-                });
-            } catch (e) {
-                res.end(`Error: ${e.message}`);
-            }
-        },
+        "/login": (req, res) => use(req, res, login),
+        "/signup": (req, res) => use(req, res, signup),
+        "/me": (req, res) => use(req, res, getMe),
+        "/post": (req, res) => use(req, res, post),
+        "/get": (req, res) => use(req, res, get),
+        "/upload": (req, res) => upload(req, res),
     };
 
     const server = app.createServer(async (req, res) => {
