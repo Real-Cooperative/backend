@@ -5,7 +5,7 @@ import { createHash } from "crypto";
 
 dotenv.config();
 
-const db = new Surreal("http://127.0.0.1:8000/rpc");
+const db = new Surreal(process.env.SURREAL_DB || "http://localhost:8000/rpc");
 
 function hmacSHA256(password, salt) {
     const passhash = createHash("sha256")
