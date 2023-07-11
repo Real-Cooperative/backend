@@ -1,13 +1,47 @@
-GET http://localhost:4000/get
+POST http://localhost:4000/me
 Content-Type: application/json
 
 {
-    "id": "recipe"
+    "token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkwNDA5NzQsIm5iZiI6MTY4OTA0MDk3NCwiZXhwIjoxNjkwMjUwNTc0LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOnVwdWoweWlmeXoxMWlyeHZrd3djIn0.hnqwkgqTJ5X16hc89JWYex0epEecsROtvGsjGmg5FCD6nocgJP6PXgRRokRDwdi5OVQxWiQfmHxCZxieI4P0Bw",
+    "username": "joonipea"
 }
 
 
 ###
-GET http://localhost:4000/post
+POST http://localhost:4000/login
+Content-Type: application/json
+
+{
+
+    "password": "12345693",
+    "username": "tobie"
+}
+
+###
+POST http://localhost:4000/signup
+Content-Type: application/json
+
+{
+    "username": "tobie",
+    "password": "12345693",
+    "email": "tobie@joonipea.com",
+    "settings": {
+        "marketing": true
+    }
+
+}
+
+###
+POST http://localhost:4000/get
+Content-Type: application/json
+
+{
+    "id": "recipe:black_eyed_peas"
+}
+
+
+###
+POST http://localhost:4000/post
 Content-Type: application/json
 
 {
