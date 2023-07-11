@@ -1,6 +1,6 @@
 # RCIAD Backend <!-- omit in toc -->
 
-The backend for Real Cooperative in the African Diaspora. This is a NodeJS server built to handle requests from the frontend and communicate with SurrealDB.
+The backend for Real Cooperative in the African Diaspora. This is a NodeJS server built to handle requests from a frontend and communicate with a SurrealDB database.
 
 ## Table of Contents <!-- omit in toc -->
 
@@ -17,13 +17,13 @@ The backend for Real Cooperative in the African Diaspora. This is a NodeJS serve
         -   [Create a new record](#create-a-new-record)
         -   [Get a record](#get-a-record)
         -   [Get multiple records of the same type](#get-multiple-records-of-the-same-type)
-    -   [Interacting with files](#interacting-with-files)
-    -   [User Authentication](#user-authentication)
-        -   [Sign up](#sign-up)
-        -   [Login](#login)
-        -   [Get logged in user details](#get-logged-in-user-details)
-    -   [Building out the API](#building-out-the-api)
+        -   [Interacting with files](#interacting-with-files)
+        -   [User Authentication](#user-authentication)
+            -   [Sign up](#sign-up)
+            -   [Login](#login)
+            -   [Get logged in user details](#get-logged-in-user-details)
 -   [Contributing](#contributing)
+    -   [Building out the API](#building-out-the-api)
 -   [Roadmap](#roadmap)
 
 ## Goals
@@ -216,7 +216,7 @@ Response:
 }
 ```
 
-### Interacting with files
+#### Interacting with files
 
 To upload a file send a POST request to `/upload`. The body of the request should be a form data object. To use this file in the frontend use the response as a URL.
 
@@ -252,11 +252,11 @@ Response:
 }
 ```
 
-### User Authentication
+#### User Authentication
 
 _(in progress)_
 
-#### Sign up
+##### Sign up
 
 To sign up send a POST request to `/signup`. The body of the request should be a JSON object with a `username` and `password` property. You can add additional properties as well, but they'll need to be defined in [user.surql](./user.surql) or through a SurrealQL request directily to the database. The `/signup` endpoint will return a JWT token that can be used to authenticate the user.
 
@@ -294,7 +294,7 @@ Response:
 }
 ```
 
-#### Login
+##### Login
 
 To login send a POST request to `/login`. The body of the request should be a JSON object with a `username` and `password` property. The `/login` endpoint will return a JWT token that can be used to authenticate the user.
 
@@ -328,7 +328,7 @@ Response:
 }
 ```
 
-#### Get logged in user details
+##### Get logged in user details
 
 To get user details send a POST request to `/me`. The request should include a JWT token in the `token` property of the body, and a username. The `/me` endpoint will return the user details.
 
@@ -368,18 +368,20 @@ Response:
 }
 ```
 
-### Building out the API
-
-_(in progress)_
-
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+### Building out the API
+
+_(in progress)_
+
 ## Roadmap
 
--   [x] Basic CRUD operations
+-   [ ] Basic CRUD operations
 -   [ ] Logout features
 -   [ ] Update user details
 -   [ ] Bolster security
 -   [ ] Add more authentication methods
+-   [ ] Delete Records
+-   [ ] Move usage to a wiki or hosted documentation
