@@ -1,6 +1,9 @@
 import Surreal from "surrealdb.js";
+import dotenv from "dotenv";
 
-const db = new Surreal("http://127.0.0.1:8000/rpc");
+dotenv.config();
+
+const db = new Surreal(process.env.SURREAL_DB || "http://localhost:8000/rpc");
 
 //Get request to SurrealDB
 const externalRequest = async (body) => {
