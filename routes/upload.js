@@ -29,7 +29,11 @@ async function upload(req, res) {
 
         fs.rename(oldpath, newpath, function (err) {
             if (err) res.end(err);
-            res.end(`${process.env.SERVER_URL}${newpath.slice(1)}`);
+            res.end(
+                `${
+                    process.env.SERVER_URL || "http://localhost:4000"
+                }${newpath.slice(1)}`
+            );
         });
     } catch (e) {
         res.end(`Error: ${e.message}`);
