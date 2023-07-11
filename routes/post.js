@@ -13,7 +13,8 @@ const externalRequest = async (body) => {
         )}`;
         await db.signin({ user: "root", pass: "root" });
         await db.use({ ns: "test", db: "test" });
-        if (await db.select(id)) {
+        let idQuery = await db.select(id);
+        if (idQuery[0]) {
             id = `${id}_${Date.now()}`;
         }
 
@@ -44,7 +45,9 @@ const externalRequest = async (body) => {
                 await db.create(objID, { name: obj.name, [body.type]: [id] });
                 return;
             }
-            objData[body.type].push(id);
+            objData[body.type] = objData[body.type]
+                ? [...objData[body.type], id]
+                : [id];
             await db.update(objID, objData);
         }
     } catch (e) {
