@@ -10,11 +10,13 @@ import fs from "fs";
 import path from "path";
 import { externalRequest as post } from "./routes/post.js";
 import { externalRequest as get } from "./routes/get.js";
-import { getMe, login, signup } from "./routes/user.js";
+import { getMe, getUser, login, signup, updateUser } from "./routes/user.js";
+import { upload } from "./routes/upload.js";
+import { delRecord } from "./routes/delete.js";
+import { use } from "./methods/use.js";
+import { getRelation } from "./routes/getRelation.js";
 
 import dotenv from "dotenv";
-import { use } from "./methods/use.js";
-import { upload } from "./routes/upload.js";
 
 dotenv.config();
 
@@ -44,13 +46,29 @@ if (cluster.isPrimary) {
         "/login": (req, res) => use(req, res, login),
         "/signup": (req, res) => use(req, res, signup),
         "/me": (req, res) => use(req, res, getMe),
+        "/user": (req, res) => use(req, res, getUser),
+        "/update-user": (req, res) => use(req, res, updateUser),
         "/post": (req, res) => use(req, res, post),
         "/get": (req, res) => use(req, res, get),
+        "/get-relation": (req, res) => use(req, res, getRelation),
+        "/delete": (req, res) => use(req, res, delRecord),
         "/upload": (req, res) => upload(req, res),
     };
 
     const server = app.createServer(async (req, res) => {
         res.setHeader("Access-Control-Allow-Origin", "*");
+
+        res.setHeader(
+            "Access-Control-Allow-Methods",
+            "POST, GET, DELETE, PATCH"
+        );
+        res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+        res.setHeader("Access-Control-Max-Age", 86400);
+        res.setHeader(
+            "Access-Control-Allow-Headers",
+            "Authentication, X-RCIAD-Requested-ID, x-rciad-page, x-rciad-limit, x-rciad-requested-relation, x-rciad-subscribed"
+        );
+
         if (req.url in routes) {
             return routes[req.url](req, res);
         } else {
