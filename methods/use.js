@@ -1,5 +1,6 @@
 async function use(req, res, func) {
     let body = {};
+    let headers = req.headers;
     req.on("error", (err) => {
         console.log(err);
     })
@@ -10,7 +11,7 @@ async function use(req, res, func) {
             res.on("error", (err) => {
                 console.error(err);
             });
-            const msg = await func(body);
+            const msg = await func(body, headers);
             res.end(JSON.stringify(msg));
         });
 }

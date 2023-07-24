@@ -1,7 +1,7 @@
 DEFINE TABLE user SCHEMAFULL
   PERMISSIONS 
-    FOR select, update WHERE id = $auth.id, 
-    FOR create, delete NONE;
+    FOR select, update WHERE id = $auth.id OR created_by = $auth.id, 
+    FOR create, delete WHERE created_by = $auth.id;
 DEFINE FIELD user ON user TYPE string;
 DEFINE FIELD pass ON user TYPE string;
 DEFINE FIELD settings ON user TYPE object;
@@ -10,6 +10,8 @@ DEFINE FIELD email ON user TYPE string;
 DEFINE FIELD created ON TABLE user TYPE datetime;
 DEFINE FIELD posts ON TABLE user TYPE array;
 DEFINE FIELD salt ON user TYPE string;
+DEFINE FIELD subscriptions ON user TYPE array;
+DEFINE FIELD subscriptions.* ON user TYPE string;
 DEFINE INDEX idx_user ON user COLUMNS user UNIQUE;
 
 

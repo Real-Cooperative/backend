@@ -1,20 +1,31 @@
 import Surreal from "surrealdb.js";
 import dotenv from "dotenv";
+import { parseJwt } from "../methods/parseJwt.js";
 
 dotenv.config();
 
 const db = new Surreal(process.env.SURREAL_DB || "http://localhost:8000/rpc");
 
-const externalRequest = async (body) => {
+const externalRequest = async (body, headers) => {
     try {
-        let id = `${body.type.replaceAll(" ", "_")}:${body.name.replaceAll(
-            " ",
-            "_"
-        )}`;
-        await db.signin({ user: "root", pass: "root" });
+        const { type, name } = body;
+        const { authentication } = headers;
+
+        const { ID } = parseJwt(authentication);
+
+        if (!type) throw new Error("type is required");
+        if (!name) throw new Error("name is required");
+        let token = await db.signin({ user: "root", pass: "root" });
+
         await db.use({ ns: "test", db: "test" });
-        let idQuery = await db.select(id);
-        if (idQuery[0]) {
+
+        let id = `${type.replaceAll(" ", "_")}:${name.replaceAll(" ", "_")}`;
+        let [idQuery] = await db.select(id);
+
+        body.created_by = ID;
+        body.created_at = Date.now();
+
+        if (idQuery) {
             id = `${id}_${Date.now()}`;
         }
 
@@ -24,7 +35,22 @@ const externalRequest = async (body) => {
                 await relateObj(body[property]);
         }
 
+        //set permissions for newly created tables
+        let [tableQuery] = await db.select(type.replaceAll(" ", "_"));
+        if (!tableQuery) {
+            await db.query(`
+             DEFINE TABLE ${type.replaceAll(" ", "_")} SCHEMALESS
+                 PERMISSIONS
+                 FOR select WHERE true
+                 FOR create, update, delete WHERE created_by = $auth.id OR $auth.admin = true;
+             `);
+        }
+
+        await db.invalidate();
+        await db.authenticate(authentication);
+        await db.use({ ns: "test", db: "test" });
         await db.create(id, body);
+
         return { message: "Success", id };
 
         async function arrayLoop(property) {
@@ -40,15 +66,24 @@ const externalRequest = async (body) => {
                 "_"
             )}`;
             obj.id = objID;
-            const objData = await db.select(objID);
-            if (objData.length === 0) {
-                await db.create(objID, { name: obj.name, [body.type]: [id] });
-                return;
+
+            const [result] = await db.select(objID);
+
+            if (!result) {
+                let [tableQuery] = await db.select(
+                    obj.type.replaceAll(" ", "_")
+                );
+                await db.create(objID, { name: obj.name, created_by: ID });
+                if (!tableQuery) {
+                    await db.query(`
+                    DEFINE TABLE ${obj.type.replaceAll(" ", "_")} SCHEMALESS
+                        PERMISSIONS
+                        FOR select WHERE true
+                        FOR create, update, delete WHERE created_by = $auth.id OR $auth.admin = true;
+                    `);
+                }
             }
-            objData[body.type] = objData[body.type]
-                ? [...objData[body.type], id]
-                : [id];
-            await db.update(objID, objData);
+            await db.query(`RELATE ${id}->made_of->${objID}`);
         }
     } catch (e) {
         console.error("ERROR", e);
