@@ -1,10 +1,25 @@
-POST http://localhost:4000/me
+PATCH http://localhost:4000/update-user
 Content-Type: application/json
+Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkyNjAwNDQsIm5iZiI6MTY4OTI2MDA0NCwiZXhwIjoxNjkwNDY5NjQ0LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOjhta2MzbTVrcDcyYXRhemZibm1hIn0.WADOjDrXjcT441VB0LzBmwCD7dRThH89fvY2A5krP-4CQR5fjNE3GK7gdQrd2Z_XGIrlp25jBkLoE7Q0AjKBXw
 
 {
-    "token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkwNDA5NzQsIm5iZiI6MTY4OTA0MDk3NCwiZXhwIjoxNjkwMjUwNTc0LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOnVwdWoweWlmeXoxMWlyeHZrd3djIn0.hnqwkgqTJ5X16hc89JWYex0epEecsROtvGsjGmg5FCD6nocgJP6PXgRRokRDwdi5OVQxWiQfmHxCZxieI4P0Bw",
+    "settings": {
+        "marketing": false
+    },
+    "subscriptions": ["user:8mkc3m5kp72atazfbnma","user:di15aw9ca4kc73nh1buv"],
     "username": "joonipea"
 }
+###
+GET http://localhost:4000/user
+Content-Type: application/javascript
+X-RCIAD-Requested-ID: tobie
+
+
+###
+GET http://localhost:4000/me
+Content-Type: application/json
+Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkyNjAwNDQsIm5iZiI6MTY4OTI2MDA0NCwiZXhwIjoxNjkwNDY5NjQ0LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOjhta2MzbTVrcDcyYXRhemZibm1hIn0.WADOjDrXjcT441VB0LzBmwCD7dRThH89fvY2A5krP-4CQR5fjNE3GK7gdQrd2Z_XGIrlp25jBkLoE7Q0AjKBXw
+
 
 
 ###
@@ -30,76 +45,104 @@ Content-Type: application/json
     }
 
 }
-
 ###
-POST http://localhost:4000/get
+DELETE http://localhost:4000/delete
 Content-Type: application/json
 
 {
-    "id": "recipe:black_eyed_peas"
+    "id": "recipe:Black_Eyed_Peas_1689273925992"
 }
+###
+GET http://localhost:4000/get-relation
+Content-Type: application/json
+X-RCIAD-Requested-ID: plant:Garlic
+x-rciad-requested-relation: made_of
 
+###
+GET http://localhost:4000/get
+X-RCIAD-Requested-ID: recipe
+x-rciad-page: 1
+x-rciad-limit: 100
+x-rciad-subscribed: user:8mkc3m5kp72atazfbnma,user:di15aw9ca4kc73nh1buv
+
+###
+GET http://localhost:4000/get
+X-RCIAD-Requested-ID: user
 
 ###
 POST http://localhost:4000/post
 Content-Type: application/json
+Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkyNzY2MjksIm5iZiI6MTY4OTI3NjYyOSwiZXhwIjoxNjkwNDg2MjI5LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOmRpMTVhdzljYTRrYzczbmgxYnV2In0.xADqVQPxc4Z2fiNkgH1W0N-kJsILU9TVsJMGc7gkJt0cOPzD0PatQ9cmtK8Kv1GN5uN8hEkb5SHxg0pnXcnFKQ
 
 {
-    "name": "Black Eyed Peas",
-    "type": "recipe",
-    "ingredients": [
-        {
-            "name": "Black Eyed Peas",
-            "quantity": 1,
-            "unit": "bunch",
-            "type": "plant"
-        },
-        {
-            "name": "Hammock",
-            "quantity": 1,
-            "unit": "kg",
-            "type": "meat"
-        },
-        {
-            "name": "Chicken Stock",
-            "quantity": 1,
-            "unit": "cup",
-            "type": "recipe"
-        },
-        {
-            "name": "Salt",
-            "quantity": 1,
-            "unit": "tsp",
-            "type": "other"
-        },
-        {
-            "name": "Pepper",
-            "quantity": 1,
-            "unit": "tsp",
-            "type": "plant"
-        },
-        {
-            "name": "Garlic",
-            "quantity": 1,
-            "unit": "clove",
-            "type": "plant"
-        },
-        {
-            "name": "Onion",
-            "quantity": 2,
-            "unit": "whole",
-            "type": "plant"
-        }
-    ],
-    "steps": [
-        {
-            "description": "Boil Hammock"
-        },
-        {
-            "description": "Add Onions"
-        },
-        {
-            "description": "Add Black Eyed Peas"
-        }
-    ]
+  "name": "Chicken Caesar Salad",
+  "type": "recipe",
+  "ingredient": [
+    {
+      "name": "Chicken Breast",
+      "quantity": 2,
+      "unit": "pieces",
+      "type": "meat"
+    },
+    {
+      "name": "Romaine Lettuce",
+      "quantity": 1,
+      "unit": "head",
+      "type": "plant"
+    },
+    {
+      "name": "Parmesan Cheese",
+      "quantity": 1,
+      "unit": "cup",
+      "type": "other"
+    },
+    {
+      "name": "Croutons",
+      "quantity": 1,
+      "unit": "cup",
+      "type": "other"
+    },
+    {
+      "name": "Caesar Dressing",
+      "quantity": 1,
+      "unit": "cup",
+      "type": "recipe"
+    },
+    {
+      "name": "Garlic",
+      "quantity": 2,
+      "unit": "cloves",
+      "type": "plant"
+    },
+    {
+      "name": "Olive Oil",
+      "quantity": 2,
+      "unit": "tbsp",
+      "type": "other"
+    },
+    {
+      "name": "Salt",
+      "quantity": 1,
+      "unit": "tsp",
+      "type": "other"
+    },
+    {
+      "name": "Black Pepper",
+      "quantity": 1,
+      "unit": "tsp",
+      "type": "other"
+    }
+  ],
+  "steps": [
+    "Season chicken breasts with salt and black pepper.",
+    "In a hot skillet, heat olive oil and cook the chicken until golden brown and cooked through.",
+    "Let the chicken rest for a few minutes, then slice it into strips.",
+    "Wash and chop romaine lettuce.",
+    "In a large bowl, combine romaine lettuce, sliced chicken, Parmesan cheese, and croutons.",
+    "Drizzle Caesar dressing over the salad and toss to coat evenly.",
+    "Serve the Chicken Caesar salad as a satisfying meal."
+  ]
 }
+
+
+
