@@ -191,7 +191,6 @@ async function updateUser(req, headers) {
             message: "Success",
         };
     } catch (e) {
-        console.error(e);
         return { status: "Error", message: e.message };
     }
 }
