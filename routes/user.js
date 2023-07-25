@@ -189,4 +189,24 @@ async function updateUser(req, headers) {
     }
 }
 
-export { login, signup, getMe, getUser, updateUser };
+async function deleteUser(req, headers) {
+    const { authentication } = headers;
+    try {
+        await db.authenticate(authentication);
+        await db.use({ ns: "test", db: "test" });
+
+        let id = parseJwt(authentication).ID;
+
+        await db.query(`DELETE made_of WHERE in=${id}`);
+        await db.delete(id);
+
+        return {
+            status: "OK",
+            message: "Success",
+        };
+    } catch (e) {
+        return { status: "Error", message: e.message };
+    }
+}
+
+export { login, signup, getMe, getUser, updateUser, deleteUser };

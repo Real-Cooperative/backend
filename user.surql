@@ -1,7 +1,8 @@
 DEFINE TABLE user SCHEMAFULL
   PERMISSIONS 
     FOR select, update WHERE id = $auth.id OR created_by = $auth.id, 
-    FOR create, delete WHERE created_by = $auth.id;
+    FOR create, WHERE created_by = $auth.id,
+    FOR delete, WHERE id = $auth.id;
 DEFINE FIELD user ON user TYPE string;
 DEFINE FIELD pass ON user TYPE string;
 DEFINE FIELD settings ON user TYPE object;
