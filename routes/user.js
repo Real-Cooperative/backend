@@ -172,15 +172,22 @@ async function updateUser(req, headers) {
             : [];
         username = username ? username : oldUser;
 
-        await db.merge(id, {
+        let content = {
             email,
             settings,
             subscriptions,
             user: username,
-        });
+        };
+
+        let query = await db.query(
+            `UPDATE ${id} MERGE ${JSON.stringify(
+                content
+            )} RETURN email, settings, subscriptions, user`
+        );
 
         return {
             status: "OK",
+            details: query[0].result[0],
             message: "Success",
         };
     } catch (e) {
