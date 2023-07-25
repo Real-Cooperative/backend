@@ -66,7 +66,7 @@ if (cluster.isPrimary) {
         res.setHeader("Access-Control-Max-Age", 86400);
         res.setHeader(
             "Access-Control-Allow-Headers",
-            "Authentication, X-RCIAD-Requested-ID, x-rciad-page, x-rciad-limit, x-rciad-requested-relation, x-rciad-subscribed"
+            "Authentication, X-RCIAD-Requested-ID, x-rciad-requested-user, x-rciad-page, x-rciad-limit, x-rciad-requested-relation, x-rciad-subscribed"
         );
 
         if (req.url in routes) {

@@ -114,14 +114,22 @@ async function getMe(req, headers) {
 }
 
 async function getUser(req, headers) {
+    const user = headers["x-rciad-requested-user"];
     const id = headers["x-rciad-requested-id"];
     try {
+        if (!user && !id) throw new Error("No user or ID provided");
+        if (user && id)
+            throw new Error("Please provide either a user or ID not both");
         await db.signin({ user: "root", pass: "root" });
         await db.use({ ns: "test", db: "test" });
 
-        let query = await db.query(
-            `SELECT *, "" as pass, "" as salt, "" as email, "" as settings FROM user WHERE user = '${id}'`
-        );
+        let query = user
+            ? await db.query(
+                  `SELECT *, "" as pass, "" as salt, "" as email, "" as settings FROM user WHERE user = '${user}'`
+              )
+            : await db.query(
+                  `SELECT *, "" as pass, "" as salt, "" as email, "" as settings FROM ${id}`
+              );
 
         let details = query[0].result[0];
 

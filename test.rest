@@ -12,7 +12,7 @@ Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkyNjAwNDQsIm5
 ###
 GET http://localhost:4000/user
 Content-Type: application/javascript
-X-RCIAD-Requested-ID: tobie
+x-rciad-requested-id: user:8mkc3m5kp72atazfbnma
 
 
 ###
@@ -60,9 +60,9 @@ x-rciad-requested-relation: made_of
 
 ###
 GET http://localhost:4000/get
-X-RCIAD-Requested-ID: recipe
+X-RCIAD-Requested-ID: user:8mkc3m5kp72atazfbnma
 x-rciad-page: 1
-x-rciad-limit: 100
+x-rciad-limit: 1
 x-rciad-subscribed: user:8mkc3m5kp72atazfbnma,user:di15aw9ca4kc73nh1buv
 
 ###
