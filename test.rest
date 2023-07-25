@@ -4,7 +4,7 @@ Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkyNjAwNDQsIm5
 
 {
     "settings": {
-        "marketing": false
+        "marketing": true
     },
     "subscriptions": ["user:8mkc3m5kp72atazfbnma","user:di15aw9ca4kc73nh1buv"],
     "username": "joonipea"
