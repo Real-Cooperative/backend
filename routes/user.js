@@ -57,31 +57,47 @@ async function login(req) {
 
 async function signup(req) {
     const { username, password, email, settings } = req;
+    try {
+        if (!username) throw new Error("Please provide a username");
+        if (!password) throw new Error("Please provide a password");
+        if (!email) throw new Error("Please provide an email");
 
-    if (email && password) {
-        try {
-            const data = `user: ${username}, password: ${password}`;
-            const salt = crypto.randomBytes(64).toString("base64");
-            const hash = hmacSHA256(data, salt).toString();
-            const time = new Date().toISOString();
-            const token = await db.signup({
-                NS: "test",
-                DB: "test",
-                SC: "allusers",
-                email: email,
-                pass: hash,
-                user: username,
-                salt: salt,
-                settings: settings,
-                created: time,
-            });
+        await db.signin({ user: "root", pass: "root" });
+        await db.use({ ns: "test", db: "test" });
 
-            return { status: "OK", token, message: "Registered" };
-        } catch (e) {
-            return { status: "Error", token: null, message: e.message };
-        }
-    } else {
-        return "Please provide a valid username and password";
+        const emailCheck = await db.query(
+            `SELECT * FROM user WHERE email = "${email}"`
+        );
+        if (emailCheck[0].result.length > 0)
+            throw new Error(
+                "There's already an account with this email <a href='/forgot'>click here to reset your password</a>"
+            );
+
+        const usernameCheck = await db.query(
+            `SELECT * FROM user WHERE user = "${username}"`
+        );
+        if (usernameCheck[0].result.length > 0)
+            throw new Error("Sorry, please choose another username");
+
+        const data = `user: ${username}, password: ${password}`;
+        const salt = crypto.randomBytes(64).toString("base64");
+        const hash = hmacSHA256(data, salt).toString();
+        const time = new Date().toISOString();
+        const token = await db.signup({
+            NS: "test",
+            DB: "test",
+            SC: "allusers",
+            email: email,
+            pass: hash,
+            user: username,
+            salt: salt,
+            settings: settings,
+            created: time,
+        });
+
+        return { status: "OK", token, message: "Registered" };
+    } catch (e) {
+        return { status: "Error", token: null, message: e.message };
     }
 }
 
