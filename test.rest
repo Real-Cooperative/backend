@@ -48,9 +48,10 @@ Content-Type: application/json
 ###
 DELETE http://localhost:4000/delete
 Content-Type: application/json
+Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkyNzY2MjksIm5iZiI6MTY4OTI3NjYyOSwiZXhwIjoxNjkwNDg2MjI5LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOmRpMTVhdzljYTRrYzczbmgxYnV2In0.xADqVQPxc4Z2fiNkgH1W0N-kJsILU9TVsJMGc7gkJt0cOPzD0PatQ9cmtK8Kv1GN5uN8hEkb5SHxg0pnXcnFKQ
 
 {
-    "id": "recipe:Black_Eyed_Peas_1689273925992"
+    "id": "recipe:Chicken_Caesar_Salad"
 }
 ###
 GET http://localhost:4000/get-relation
