@@ -15,7 +15,6 @@ const externalRequest = async (body, headers) => {
 
         if (!type) throw new Error("type is required");
         if (!name) throw new Error("name is required");
-        let token = await db.signin({ user: "root", pass: "root" });
 
         await db.use({ ns: "test", db: "test" });
 
