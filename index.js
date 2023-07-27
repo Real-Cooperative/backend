@@ -53,10 +53,17 @@ if (cluster.isPrimary) {
         "/get-relation": (req, res) => use(req, res, getRelation),
         "/delete": (req, res) => use(req, res, delRecord),
         "/upload": (req, res) => upload(req, res),
+        "/health": (req, res) => {
+            res.writeHead(200);
+            res.end("OK");
+        },
     };
 
     const server = app.createServer(async (req, res) => {
-        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader(
+            "Access-Control-Allow-Origin",
+            process.env.WHITE_LISTED_DOMAIN
+        );
 
         res.setHeader(
             "Access-Control-Allow-Methods",
