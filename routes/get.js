@@ -20,7 +20,7 @@ const externalRequest = async (body, headers) => {
         const limit = headers["x-rciad-limit"] || 10;
         const page = headers["x-rciad-page"] || 1;
         let data = {};
-        await db.signin({ user: "root", pass: "root" });
+        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
         await db.use({ ns: "test", db: "test" });
         let pageQuery = await db.query(
             `SELECT * FROM ${id} WHERE ${

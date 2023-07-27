@@ -1,4 +1,7 @@
 import Surreal from "surrealdb.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const db = new Surreal(process.env.SURREAL_DB || "http://localhost:8000/rpc");
 
@@ -9,7 +12,7 @@ const getRelation = async (body, headers) => {
         const realtion = headers["x-rciad-requested-relation"];
         const id = headers["x-rciad-requested-id"];
 
-        await db.signin({ user: "root", pass: "root" });
+        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
         await db.use({ ns: "test", db: "test" });
 
         const data = await db.query(

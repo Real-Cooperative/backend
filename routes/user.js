@@ -22,7 +22,7 @@ async function login(req) {
 
     if (username && password) {
         const data = `user: ${username}, password: ${password}`;
-        await db.signin({ user: "root", pass: "root" });
+        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
         await db.use({ ns: "test", db: "test" });
         const userData = await db.query(
             `SELECT * FROM user WHERE user = "${username}"`
@@ -62,7 +62,7 @@ async function signup(req) {
         if (!password) throw new Error("Please provide a password");
         if (!email) throw new Error("Please provide an email");
 
-        await db.signin({ user: "root", pass: "root" });
+        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
         await db.use({ ns: "test", db: "test" });
 
         const emailCheck = await db.query(
@@ -136,7 +136,7 @@ async function getUser(req, headers) {
         if (!user && !id) throw new Error("No user or ID provided");
         if (user && id)
             throw new Error("Please provide either a user or ID not both");
-        await db.signin({ user: "root", pass: "root" });
+        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
         await db.use({ ns: "test", db: "test" });
 
         let query = user
