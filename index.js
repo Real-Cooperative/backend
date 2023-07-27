@@ -56,10 +56,7 @@ if (cluster.isPrimary) {
     };
 
     const server = app.createServer(async (req, res) => {
-        res.setHeader(
-            "Access-Control-Allow-Origin",
-            process.env.WHITE_LISTED_DOMAIN
-        );
+        res.setHeader("Access-Control-Allow-Origin", "*");
 
         res.setHeader(
             "Access-Control-Allow-Methods",
