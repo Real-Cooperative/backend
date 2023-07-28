@@ -43,16 +43,16 @@ if (cluster.isPrimary) {
     });
 } else {
     const routes = {
-        "/login": (req, res) => use(req, res, login),
-        "/signup": (req, res) => use(req, res, signup),
-        "/me": (req, res) => use(req, res, getMe),
-        "/user": (req, res) => use(req, res, getUser),
-        "/update-user": (req, res) => use(req, res, updateUser),
-        "/post": (req, res) => use(req, res, post),
-        "/get": (req, res) => use(req, res, get),
-        "/get-relation": (req, res) => use(req, res, getRelation),
-        "/delete": (req, res) => use(req, res, delRecord),
-        "/upload": (req, res) => upload(req, res),
+        "/api/v1/login": (req, res) => use(req, res, login),
+        "/api/v1/signup": (req, res) => use(req, res, signup),
+        "/api/v1/me": (req, res) => use(req, res, getMe),
+        "/api/v1/user": (req, res) => use(req, res, getUser),
+        "/api/v1/update-user": (req, res) => use(req, res, updateUser),
+        "/api/v1/post": (req, res) => use(req, res, post),
+        "/api/v1/get": (req, res) => use(req, res, get),
+        "/api/v1/get-relation": (req, res) => use(req, res, getRelation),
+        "/api/v1/delete": (req, res) => use(req, res, delRecord),
+        "/api/v1/upload": (req, res) => upload(req, res),
         "/": (req, res) => {
             res.writeHead(200);
             res.end("OK");
