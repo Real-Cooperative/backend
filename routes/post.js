@@ -16,6 +16,7 @@ const externalRequest = async (body, headers) => {
         if (!type) throw new Error("type is required");
         if (!name) throw new Error("name is required");
 
+        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
         await db.use({ ns: "test", db: "test" });
 
         let id = `${type.replaceAll(" ", "_")}:${name.replaceAll(" ", "_")}`;
