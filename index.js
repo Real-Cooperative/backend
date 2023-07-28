@@ -53,7 +53,7 @@ if (cluster.isPrimary) {
         "/get-relation": (req, res) => use(req, res, getRelation),
         "/delete": (req, res) => use(req, res, delRecord),
         "/upload": (req, res) => upload(req, res),
-        "/health": (req, res) => {
+        "/": (req, res) => {
             res.writeHead(200);
             res.end("OK");
         },
