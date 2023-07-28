@@ -4,8 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "NODE_ENV=production nodemon index.js",
-        "dev": "NODE_ENV=development nodemon index.js",
+        "start": "NODE_ENV=production node index.js",
+        "dev": "NODE_ENV=development node index.js",
         "test": "jest --watchAll --verbose --forceExit --detectOpenHandles",
         "surreal": "surreal start --log debug --user root --pass root memory & surreal import --conn http://localhost:8000 --user root --pass root --ns test --db test user.surql"
     },
