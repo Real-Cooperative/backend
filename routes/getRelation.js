@@ -1,13 +1,10 @@
-import Surreal from "surrealdb.js";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const db = new Surreal(process.env.SURREAL_DB || "http://localhost:8000/rpc");
-
 // Get relation from SurrealDB
 
-const getRelation = async (body, headers) => {
+const getRelation = async (body, headers, db) => {
     try {
         const realtion = headers["x-rciad-requested-relation"];
         const id = headers["x-rciad-requested-id"];

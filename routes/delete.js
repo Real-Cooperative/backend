@@ -1,12 +1,9 @@
-import Surreal from "surrealdb.js";
 import dotenv from "dotenv";
 import { parseJwt } from "../methods/parseJwt.js";
 
 dotenv.config();
 
-const db = new Surreal(process.env.SURREAL_DB || "http://localhost:8000/rpc");
-
-const delRecord = async (body, headers) => {
+const delRecord = async (body, headers, db) => {
     try {
         const { id } = body;
         if (!id) throw new Error("No ID provided");

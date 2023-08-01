@@ -1,12 +1,9 @@
-import Surreal from "surrealdb.js";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import { createHash } from "crypto";
 import { parseJwt } from "../methods/parseJwt.js";
 
 dotenv.config();
-
-const db = new Surreal(process.env.SURREAL_DB || "http://localhost:8000/rpc");
 
 function hmacSHA256(password, salt) {
     const passhash = createHash("sha256")
@@ -17,7 +14,7 @@ function hmacSHA256(password, salt) {
     return passhash;
 }
 
-async function login(req) {
+async function login(req, headers, db) {
     const { username, password } = req;
 
     if (username && password) {
@@ -55,7 +52,7 @@ async function login(req) {
     }
 }
 
-async function signup(req) {
+async function signup(req, headers, db) {
     const { username, password, email, settings } = req;
     try {
         if (!username) throw new Error("Please provide a username");
@@ -101,7 +98,7 @@ async function signup(req) {
     }
 }
 
-async function getMe(req, headers) {
+async function getMe(req, headers, db) {
     const { authentication } = headers;
     try {
         await db.authenticate(authentication);
@@ -129,7 +126,7 @@ async function getMe(req, headers) {
     }
 }
 
-async function getUser(req, headers) {
+async function getUser(req, headers, db) {
     const user = headers["x-rciad-requested-user"];
     const id = headers["x-rciad-requested-id"];
     try {
@@ -163,7 +160,7 @@ async function getUser(req, headers) {
     }
 }
 
-async function updateUser(req, headers) {
+async function updateUser(req, headers, db) {
     const { authentication } = headers;
     let { email, settings, subscriptions, username } = req;
     try {
@@ -211,7 +208,7 @@ async function updateUser(req, headers) {
     }
 }
 
-async function deleteUser(req, headers) {
+async function deleteUser(req, headers, db) {
     const { authentication } = headers;
     try {
         await db.authenticate(authentication);
