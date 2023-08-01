@@ -32,6 +32,14 @@ const externalRequest = async (body, headers) => {
             } ORDER created_at DESC LIMIT ${limit} START ${(page - 1) * limit}`
         );
         data.page = pageQuery[0].result;
+        data.page.map(async (item) => {
+            let authorQuery = await db.query(
+                `SELECT user FROM ${item.created_by}`
+            );
+            item.author = authorQuery[0].result[0]
+                ? authorQuery[0].result[0].user
+                : "Anonymous";
+        });
         let countQuery = await db.query(
             `SELECT count() FROM ${id} WHERE ${
                 user
