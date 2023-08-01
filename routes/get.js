@@ -52,8 +52,6 @@ const externalRequest = async (body, headers, db) => {
         return data;
     } catch (e) {
         console.error("ERROR", e);
-    } finally {
-        await db.invalidate();
     }
 };
 
