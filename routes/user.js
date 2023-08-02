@@ -16,39 +16,40 @@ function hmacSHA256(password, salt) {
 
 async function login(req, headers, db) {
     const { username, password } = req;
-
-    if (username && password) {
-        const data = `user: ${username}, password: ${password}`;
-        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
-        await db.use({ ns: "test", db: "test" });
-        const userData = await db.query(
-            `SELECT * FROM user WHERE user = "${username}"`
-        );
-        if (userData) {
+    try {
+        if (username && password) {
+            const data = `user: ${username}, password: ${password}`;
+            await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
+            await db.use({ ns: "test", db: "test" });
+            const userData = await db.query(
+                `SELECT * FROM user WHERE user = "${username}"`
+            );
+            if (!userData[0].result[0]) {
+                throw new Error("User not found");
+            }
             const { salt } = userData[0].result[0];
 
             const hash = hmacSHA256(data, salt).toString();
 
             await db.invalidate();
-            try {
-                const token = await db.signin({
-                    NS: "test",
-                    DB: "test",
-                    SC: "allusers",
-                    user: username,
-                    pass: hash,
-                });
-                return { status: "OK", token, message: "Signed in" };
-            } catch (e) {
-                return { status: "Error", token: null, message: e.message };
-            }
+
+            const token = await db.signin({
+                NS: "test",
+                DB: "test",
+                SC: "allusers",
+                user: username,
+                pass: hash,
+            });
+            return { status: "OK", token, message: "Signed in" };
+        } else {
+            return {
+                status: "Error",
+                token: null,
+                message: "Please provide an email and password",
+            };
         }
-    } else {
-        return {
-            status: "Error",
-            token: null,
-            message: "Please provide an email and password",
-        };
+    } catch (e) {
+        return { status: "Error", token: null, message: e.message };
     }
 }
 
