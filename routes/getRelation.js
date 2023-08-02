@@ -19,7 +19,6 @@ const getRelation = async (body, headers, db) => {
         let result = [];
         for (let i = 0; i < data[0].result.length; i++) {
             const element = data[0].result[i];
-            console.log(element.in);
             const sib = await db.query(`SELECT * FROM ${element.in}`);
             result.push(sib[0].result[0]);
         }
