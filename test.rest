@@ -74,70 +74,58 @@ x-rciad-limit: 100
 ###
 POST http://localhost:4000/api/v1/post
 Content-Type: application/json
-Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2OTA5MDUzMzgsIm5iZiI6MTY5MDkwNTMzOCwiZXhwIjoxNjkyMTE0OTM4LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOmFzOTE0YXA1bGRjdXF6NG5zN2p2In0.bgoHuax5M5Et53PF35uukM6Q14CGpytyWUngtaICx4iIuX3aoJAhZqF30_RqbXz1qs8ogRQzRXo7ViSFKDrWKA
+Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkyNzY2MjksIm5iZiI6MTY4OTI3NjYyOSwiZXhwIjoxNjkwNDg2MjI5LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOmRpMTVhdzljYTRrYzczbmgxYnV2In0.xADqVQPxc4Z2fiNkgH1W0N-kJsILU9TVsJMGc7gkJt0cOPzD0PatQ9cmtK8Kv1GN5uN8hEkb5SHxg0pnXcnFKQ
 
     {
-  "name": "Gluten Free Vegan Chocolate Chip Cookies",
+  "name": "Peach Cobbler",
   "type": "recipe",
   "ingredient": [
     {
-      "name": "Brown Sugar",
+      "name": "Yellow Cake Mix",
       "quantity": "1",
       "type": "ingredient",
-      "unit": "cup"
+      "unit": "box"
     },
     {
-      "name": "Coconut Oil",
-      "quantity": "0.75",
+      "name": "Peaches",
+      "quantity": "2",
       "type": "ingredient",
-      "unit": "cup"
+      "unit": "cans",
+      "comment": "15 oz each, only 1 drained"
     },
     {
-      "name": "Apple Sauce",
-      "quantity": "0.5",
+      "name": "Butter",
+      "quantity": "1/2",
       "type": "ingredient",
-      "unit": "cup"
+      "unit": "cup",
+      "comment": "melted"
     },
     {
       "name": "Vanilla Extract",
-      "quantity": "2",
-      "type": "ingredient",
-      "unit": "tsp"
-    },
-    {
-      "name": "Espresso Grounds",
-      "quantity": "0.25",
-      "type": "ingredient",
-      "unit": "cup"
-    },
-    {
-      "name": "Almond Flour",
-      "quantity": "2.5",
-      "type": "ingredient",
-      "unit": "cup"
-    },
-    {
-      "name": "Dark Chocolate",
-      "quantity": "4",
-      "type": "ingredient",
-      "unit": "oz"
-    },
-    {
-      "name": "Baking Powder",
       "quantity": "1",
       "type": "ingredient",
-      "unit": "tsp"
+      "unit": "teaspoon"
+    },
+    {
+      "name": "Cinnamon",
+      "quantity": "1/2",
+      "type": "ingredient",
+      "unit": "teaspoon",
+      "comment": "optional"
     }
   ],
   "steps": [
-    "Preheat oven to 350ºF.",
-    "Mix coconut oil, brown sugar, apple sauce, and vanilla extract with a hand mixer.",
-    "In a separate bowl, mix almond flour, espresso grounds, and baking powder.",
-    "Fold the dry mixture into the wet mixture.",
-    "Fold in the dark chocolate chips.",
-    "Roll the dough into 1-inch balls and place them on a lined baking sheet.",
-    "Bake for 8-10 minutes."
+    "Preheat the oven to 350 degrees F. Spray a 9x9\" baking dish with non-stick spray.",
+    "Pour sliced peaches from cans in the bottom of your pan (drain only 1 can of liquid).",
+    "In a separate bowl, whisk together cake mix and cinnamon (optional).",
+    "In a small bowl, stir together melted butter and vanilla extract.",
+    "Top the peaches with the cake mix, then drizzle with the melted butter.",
+    "Bake for approximately 35-40 minutes, or until the top becomes slightly golden brown.",
+    "Remove from the oven and cool slightly before serving.",
+    "Top with ice cream, if desired."
   ]
 }
+
+
 
 
