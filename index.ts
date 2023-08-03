@@ -1,12 +1,12 @@
 import * as app from "http";
 
 import { Surreal } from "surrealdb.js";
-import { externalRequest as post } from "./routes/post.js";
-import { externalRequest as get } from "./routes/get.js";
-import { getMe, getUser, login, signup, updateUser } from "./routes/user.js";
-import { delRecord } from "./routes/delete.js";
-import { use } from "./methods/use.js";
-import { getRelation } from "./routes/getRelation.js";
+import { externalRequest as post } from "./routes/post";
+import { externalRequest as get } from "./routes/get";
+import { getMe, getUser, login, signup, updateUser } from "./routes/user";
+import { delRecord } from "./routes/delete";
+import { use } from "./methods/use";
+import { getRelation } from "./routes/getRelation";
 
 import dotenv from "dotenv";
 
