@@ -2,10 +2,34 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 import { createHash } from "crypto";
 import { parseJwt } from "../methods/parseJwt.js";
+import { Surreal, headers } from "./routes";
 
 dotenv.config();
 
-function hmacSHA256(password, salt) {
+const dbPass = process.env.SURREAL_PASS || "root";
+
+type request = {
+    username: string;
+    password: string;
+    email?: string;
+    settings?: any;
+    subscriptions?: Array<string>;
+};
+
+type user = {
+    user: string;
+    email: string;
+    settings: {
+        marketing: boolean;
+    };
+    id: string;
+    subscriptions?: Array<string>;
+    created: string;
+    pass: string;
+    salt: string;
+};
+
+function hmacSHA256(password: crypto.BinaryLike, salt: string) {
     const passhash = createHash("sha256")
         .update(password)
         .update(createHash("sha256").update(salt, "utf8").digest("hex"))
@@ -14,20 +38,25 @@ function hmacSHA256(password, salt) {
     return passhash;
 }
 
-async function login(req, headers, db) {
+async function login(req: request, headers: headers, db: Surreal) {
     const { username, password } = req;
     try {
         if (username && password) {
             const data = `user: ${username}, password: ${password}`;
-            await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
+            await db.signin({ user: "root", pass: dbPass });
             await db.use({ ns: "test", db: "test" });
-            const userData = await db.query(
+            type user = {
+                salt: string;
+            };
+
+            const userDataQuery = await db.query<[user[]]>(
                 `SELECT * FROM user WHERE user = "${username}"`
             );
-            if (!userData[0].result[0]) {
+            const userData = userDataQuery[0].result;
+            if (!userData || !userData[0]) {
                 throw new Error("User not found");
             }
-            const { salt } = userData[0].result[0];
+            const { salt } = userData[0];
 
             const hash = hmacSHA256(data, salt).toString();
 
@@ -48,33 +77,39 @@ async function login(req, headers, db) {
                 message: "Please provide an email and password",
             };
         }
-    } catch (e) {
+    } catch (e: any) {
         return { status: "Error", token: null, message: e.message };
     }
 }
 
-async function signup(req, headers, db) {
+async function signup(req: request, headers: headers, db: Surreal) {
     const { username, password, email, settings } = req;
     try {
         if (!username) throw new Error("Please provide a username");
         if (!password) throw new Error("Please provide a password");
         if (!email) throw new Error("Please provide an email");
 
-        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
+        await db.signin({ user: "root", pass: dbPass });
         await db.use({ ns: "test", db: "test" });
 
-        const emailCheck = await db.query(
-            `SELECT * FROM user WHERE email = "${email}"`
+        type count = {
+            count: number;
+        };
+
+        const emailCheckResult = await db.query<[count]>(
+            `SELECT count() FROM user WHERE email = "${email}"`
         );
-        if (emailCheck[0].result.length > 0)
+        const emailCheck = emailCheckResult?.[0]?.result?.count || 0;
+        if (emailCheck)
             throw new Error(
                 "There's already an account with this email <a href='/forgot'>click here to reset your password</a>"
             );
 
-        const usernameCheck = await db.query(
-            `SELECT * FROM user WHERE user = "${username}"`
+        const usernameCheckResult = await db.query<[count]>(
+            `SELECT count() FROM user WHERE user = "${username}"`
         );
-        if (usernameCheck[0].result.length > 0)
+        const usernameCheck = usernameCheckResult?.[0]?.result?.count || 0;
+        if (usernameCheck)
             throw new Error("Sorry, please choose another username");
 
         const data = `user: ${username}, password: ${password}`;
@@ -94,88 +129,98 @@ async function signup(req, headers, db) {
         });
 
         return { status: "OK", token, message: "Registered" };
-    } catch (e) {
+    } catch (e: any) {
         return { status: "Error", token: null, message: e.message };
     }
 }
 
-async function getMe(req, headers, db) {
+async function getMe(req: request, headers: headers, db: Surreal) {
     const { authentication } = headers;
     try {
+        if (!authentication) throw new Error("No authentication provided");
         await db.authenticate(authentication);
         await db.use({ ns: "test", db: "test" });
 
         let id = parseJwt(authentication).ID;
 
-        let query = await db.query(
+        let query = await db.query<[user[]]>(
             `SELECT *, "" as pass, "" as salt FROM ${id}`
         );
 
-        let details = query[0].result[0];
+        let details = query?.[0]?.result?.[0] || null;
 
-        Object.keys(details).forEach(
-            (key) => details[key] === "" && delete details[key]
-        );
+        if (!details) throw new Error("User not found");
+        Object.keys(details).forEach((key) => {
+            if (details?.[key as keyof typeof details] === "") {
+                delete details[key as keyof typeof details];
+            }
+        });
 
         return {
             status: "OK",
             details: details,
             message: "Success",
         };
-    } catch (e) {
+    } catch (e: any) {
         return { status: "Error", details: null, message: e.message };
     }
 }
 
-async function getUser(req, headers, db) {
+async function getUser(req: request, headers: headers, db: Surreal) {
     const user = headers["x-rciad-requested-user"];
     const id = headers["x-rciad-requested-id"];
     try {
         if (!user && !id) throw new Error("No user or ID provided");
         if (user && id)
             throw new Error("Please provide either a user or ID not both");
-        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
+        await db.signin({ user: "root", pass: dbPass });
         await db.use({ ns: "test", db: "test" });
 
         let query = user
-            ? await db.query(
+            ? await db.query<[user[]]>(
                   `SELECT *, "" as pass, "" as salt, "" as email, "" as settings FROM user WHERE user = '${user}'`
               )
-            : await db.query(
+            : await db.query<[user[]]>(
                   `SELECT *, "" as pass, "" as salt, "" as email, "" as settings FROM ${id}`
               );
 
-        let details = query[0].result[0];
+        let details = query?.[0]?.result?.[0] || null;
 
-        Object.keys(details).forEach(
-            (key) => details[key] === "" && delete details[key]
-        );
+        if (!details) throw new Error("User not found");
+        Object.keys(details).forEach((key) => {
+            if (details?.[key as keyof typeof details] === "") {
+                delete details[key as keyof typeof details];
+            }
+        });
 
         return {
             status: "OK",
             details: details,
             message: "Success",
         };
-    } catch (e) {
+    } catch (e: any) {
         return { status: "Error", details: null, message: e.message };
     }
 }
 
-async function updateUser(req, headers, db) {
+async function updateUser(req: request, headers: headers, db: Surreal) {
     const { authentication } = headers;
     let { email, settings, subscriptions, username } = req;
     try {
+        if (!authentication) throw new Error("No authentication provided");
         await db.authenticate(authentication);
         await db.use({ ns: "test", db: "test" });
 
         let id = parseJwt(authentication).ID;
 
-        let userDetails = await db.query(`SELECT * FROM ${id}`);
+        let userDetailsResult = await db.query<[user[]]>(`SELECT * FROM ${id}`);
+        let userDetails = userDetailsResult?.[0]?.result?.[0] || null;
+        if (!userDetails) throw new Error("User not found");
 
-        let oldEmail = userDetails[0].result[0].email;
-        let oldSettings = userDetails[0].result[0].settings;
-        let oldSubscriptions = userDetails[0].result[0].subscriptions;
-        let oldUser = userDetails[0].result[0].user;
+        let oldEmail = userDetails.email;
+        let oldSettings = userDetails.settings;
+        let oldSubscriptions = userDetails.subscriptions;
+        let oldUser = userDetails.user;
 
         email = email ? email : oldEmail;
         settings = settings ? settings : oldSettings;
@@ -193,7 +238,7 @@ async function updateUser(req, headers, db) {
             user: username,
         };
 
-        let query = await db.query(
+        let query = await db.query<[user[]]>(
             `UPDATE ${id} MERGE ${JSON.stringify(
                 content
             )} RETURN email, settings, subscriptions, user`
@@ -201,17 +246,18 @@ async function updateUser(req, headers, db) {
 
         return {
             status: "OK",
-            details: query[0].result[0],
+            details: query[0].result?.[0],
             message: "Success",
         };
-    } catch (e) {
+    } catch (e: any) {
         return { status: "Error", message: e.message };
     }
 }
 
-async function deleteUser(req, headers, db) {
+async function deleteUser(req: request, headers: headers, db: Surreal) {
     const { authentication } = headers;
     try {
+        if (!authentication) throw new Error("No authentication provided");
         await db.authenticate(authentication);
         await db.use({ ns: "test", db: "test" });
 
@@ -224,7 +270,7 @@ async function deleteUser(req, headers, db) {
             status: "OK",
             message: "Success",
         };
-    } catch (e) {
+    } catch (e: any) {
         return { status: "Error", message: e.message };
     }
 }

@@ -1,19 +1,34 @@
 import dotenv from "dotenv";
 import { parseJwt } from "../methods/parseJwt.js";
+import { Surreal, headers } from "./routes";
 
 dotenv.config();
 
-const externalRequest = async (body, headers, db) => {
+type request = {
+    type: string;
+    name: string;
+    [key: string]: any;
+};
+
+const dbPass = process.env.SURREAL_PASS || "root";
+
+const externalRequest = async (
+    body: request,
+    headers: headers,
+    db: Surreal
+) => {
     try {
         const { type, name } = body;
         const { authentication } = headers;
+
+        if (!authentication) throw new Error("authentication is required");
 
         const { ID } = parseJwt(authentication);
 
         if (!type) throw new Error("type is required");
         if (!name) throw new Error("name is required");
 
-        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
+        await db.signin({ user: "root", pass: dbPass });
         await db.use({ ns: "test", db: "test" });
 
         let id = `${type.replaceAll(" ", "_")}:${name.replaceAll(" ", "_")}`;
@@ -50,13 +65,13 @@ const externalRequest = async (body, headers, db) => {
 
         return { message: "Success", id };
 
-        async function arrayLoop(property) {
+        async function arrayLoop(property: string) {
             for (let obj of body[property]) {
                 await relateObj(obj);
             }
         }
 
-        async function relateObj(obj) {
+        async function relateObj(obj: request) {
             if (!obj.type || !obj.name) return;
             let objID = `${obj.type.replaceAll(" ", "_")}:${obj.name.replaceAll(
                 " ",
@@ -82,7 +97,7 @@ const externalRequest = async (body, headers, db) => {
             }
             await db.query(`RELATE ${id}->made_of->${objID}`);
         }
-    } catch (e) {
+    } catch (e: any) {
         console.error("ERROR", e);
         return { message: "Error", e: e.message };
     }

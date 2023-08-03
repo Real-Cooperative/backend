@@ -1,31 +1,45 @@
 import dotenv from "dotenv";
+import { Surreal, headers } from "./routes";
 
 dotenv.config();
 
 // Get relation from SurrealDB
+const dbPass = process.env.SURREAL_PASS || "root";
 
-const getRelation = async (body, headers, db) => {
+const getRelation = async (body: any, headers: headers, db: Surreal) => {
     try {
         const realtion = headers["x-rciad-requested-relation"];
         const id = headers["x-rciad-requested-id"];
 
-        await db.signin({ user: "root", pass: process.env.SURREAL_PASS });
+        await db.signin({ user: "root", pass: dbPass });
         await db.use({ ns: "test", db: "test" });
 
-        const data = await db.query(
+        type relation = {
+            in: string;
+        };
+
+        const dataResult = await db.query<[relation[]]>(
             `SELECT in FROM ${realtion} WHERE out = ${id}`
         );
 
         let result = [];
-        for (let i = 0; i < data[0].result.length; i++) {
-            const element = data[0].result[i];
-            const sib = await db.query(`SELECT * FROM ${element.in}`);
-            result.push(sib[0].result[0]);
+        let data = dataResult[0].result || null;
+
+        if (!data) throw new Error("No results found");
+
+        for (let i = 0; i < data.length; i++) {
+            const element = data[i];
+            const sibResult = await db.query<[any[]]>(
+                `SELECT * FROM ${element.in}`
+            );
+            let sib = sibResult?.[0]?.result?.[0] || null;
+            if (!sib) continue;
+            result.push(sib);
         }
 
         return result;
-    } catch (e) {
-        console.log(e);
+    } catch (e: any) {
+        return { status: "Error", message: e.message };
     }
 };
 
