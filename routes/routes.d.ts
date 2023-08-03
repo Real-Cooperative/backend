@@ -1,6 +1,5 @@
 import type http from "http";
 import type Surreal from "surrealdb.js";
-import type { QueryResult } from "surrealdb.js/script/types.d.ts";
 
 type nodeRequest = http.IncomingMessage;
 type nodeResponse = http.ServerResponse<http.IncomingMessage> & {
