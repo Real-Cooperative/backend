@@ -1,9 +1,15 @@
 import dotenv from "dotenv";
-import { parseJwt } from "../methods/parseJwt.js";
+import { parseJwt } from "../methods/parseJwt";
+import { Surreal, headers } from "./routes";
 
 dotenv.config();
 
-const delRecord = async (body, headers, db) => {
+type request = {
+    id: string;
+    [key: string]: any;
+};
+
+const delRecord = async (body: request, headers: headers, db: Surreal) => {
     try {
         const { id } = body;
         if (!id) throw new Error("No ID provided");
@@ -22,7 +28,7 @@ const delRecord = async (body, headers, db) => {
         await db.delete(id);
         await db.query(`DELETE made_of WHERE in=${id}`);
         return { status: "OK", message: `${id} was deleted` };
-    } catch (e) {
+    } catch (e: any) {
         return { status: "Error", message: e.message };
     }
 };
