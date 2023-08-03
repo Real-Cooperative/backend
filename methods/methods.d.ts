@@ -5,7 +5,6 @@ type nodeRequest = http.IncomingMessage;
 type nodeResponse = http.ServerResponse<http.IncomingMessage> & {
     req: http.IncomingMessage;
 };
-// copilot add these headers to headers type "Authentication, X-RCIAD-Requested-ID, x-rciad-requested-user, x-rciad-page, x-rciad-limit, x-rciad-requested-relation, x-rciad-subscribed"
 type headers = http.IncomingHttpHeaders & {
     "x-access-token"?: string;
     "x-refresh-token"?: string;
