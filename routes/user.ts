@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import crypto from "crypto";
 import { createHash } from "crypto";
-import { parseJwt } from "../methods/parseJwt.js";
+import { parseJwt } from "../methods/parseJwt";
 import { Surreal, headers } from "./routes";
 
 dotenv.config();
@@ -244,13 +244,17 @@ async function updateUser(req: request, headers: headers, db: Surreal) {
             )} RETURN email, settings, subscriptions, user`
         );
 
+        let details = query?.[0]?.result?.[0] || null;
+
+        if (!details) throw new Error("No details returned");
+
         return {
             status: "OK",
-            details: query[0].result?.[0],
+            details: details,
             message: "Success",
         };
     } catch (e: any) {
-        return { status: "Error", message: e.message };
+        return { status: "Error", details: null, message: e.message };
     }
 }
 

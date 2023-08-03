@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { parseJwt } from "../methods/parseJwt.js";
+import { parseJwt } from "../methods/parseJwt";
 import { Surreal, headers } from "./routes";
 dotenv.config();
 
