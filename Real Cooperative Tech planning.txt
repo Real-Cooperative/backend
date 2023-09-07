@@ -18,16 +18,30 @@ Communities
     Ancestor Communities: Community.id
     Locations: Location.id
     Spiritual Expression
-    Political
+    Means of Governance
     Images: URL[]
     Medicine
-    Economic
-    Language: Language.id
+    Economic organization/Political OR Social Economy
+    Languages: Language.id[]
 
 Language
     Name
     Dialects []
+    Vernaculars []
     Language.id
+
+Vernaculars
+    Sub Vernaculars []
+    Communites []
+    Locations []
+    Grammar
+    Common Colloquialisms
+    Connected Languages
+
+Dialects
+    Name
+    Locations
+    Dialect.id
 
 Location
     Plants: plants.id[]
