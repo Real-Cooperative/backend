@@ -12,13 +12,13 @@ Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2ODkyNjAwNDQsIm5
 ###
 GET http://localhost:4000/api/v1/user
 Content-Type: application/javascript
-x-rciad-requested-id: user:8mkc3m5kp72atazfbnma
+x-rciad-requested-id: user:f2br50o9k7kpl0it6ql6
 
 
 ###
 GET http://localhost:4000/api/v1/me
 Content-Type: application/json
-Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2OTA1MDg0MTQsIm5iZiI6MTY5MDUwODQxNCwiZXhwIjoxNjkxNzE4MDE0LCJpc3MiOiJTdXJyZWFsREIiLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbHVzZXJzIiwiSUQiOiJ1c2VyOjd3M2M5dHo1YXVudTV0cjFraGFzIn0.FAkOoHN9H7DNsDM5REGEidXbYLNi5l1DngV1vbvcVOWNAyM0V7_n5uUeHRXPYmTh98515_qTGnlKdjFE9nkHNQ
+Authentication: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MTU2MTYxODUsIm5iZiI6MTcxNTYxNjE4NSwiZXhwIjoxNzE4MjA4MTg1LCJpc3MiOiJTdXJyZWFsREIiLCJqdGkiOiI1NWM3MzZlZS01ZDMyLTQ2NDctYTQ3Yi1jZGFhZDA4YjhjNTciLCJOUyI6InRlc3QiLCJEQiI6InRlc3QiLCJTQyI6ImFsbF91c2VycyIsIklEIjoidXNlcjpmMmJyNTBvOWs3a3BsMGl0NnFsNiJ9.blrGz70XZN9cZFDxDjVqyB1zcOly4npL3jPaowIAFtTqBl05iTsj9ERGZLDMgpl16YtGYhID_pmsJJvVN-xNnQ
 
 
 
@@ -28,8 +28,8 @@ Content-Type: application/json
 
 {
 
-    "password": "12345693",
-    "username": "tobie"
+    "password": "asdfkfdas",
+    "username": "betaalph"
 }
 
 ###
@@ -37,12 +37,9 @@ POST http://localhost:4000/api/v1/signup
 Content-Type: application/json
 
 {
-    "username": "tobie",
-    "password": "12345693",
-    "email": "tobie@joonipea.com",
-    "settings": {
-        "marketing": true
-    }
+    "username": "betaalph",
+    "password": "asdfkfdas",
+    "email": "tories@joonipea.com"
 
 }
 ###

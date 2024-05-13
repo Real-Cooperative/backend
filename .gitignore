@@ -3,3 +3,4 @@ node_modules
 assets
 test.rest
 package-lock.json
+surreal.db

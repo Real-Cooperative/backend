@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { parseJwt } from "../methods/parseJwt";
 import { Surreal, headers } from "./routes";
+import { RecordId } from "surrealdb.js";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ type request = {
 };
 
 const dbPass = process.env.SURREAL_PASS || "root";
+const db_url = process.env.SURREAL_DB || "http://localhost:8000/rpc";
 
 const externalRequest = async (
     body: request,
@@ -28,17 +30,20 @@ const externalRequest = async (
         if (!type) throw new Error("type is required");
         if (!name) throw new Error("name is required");
 
-        await db.signin({ user: "root", pass: dbPass });
-        await db.use({ ns: "test", db: "test" });
-
-        let id = `${type.replaceAll(" ", "_")}:${name.replaceAll(" ", "_")}`;
-        let [idQuery] = await db.select(id);
+        let id = new RecordId(
+            type.replaceAll(" ", "_"),
+            name.replaceAll(" ", "_")
+        );
+        let idQuery = await db.select(id);
 
         body.created_by = ID;
         body.created_at = Date.now();
 
         if (idQuery) {
-            id = `${id}_${Date.now()}`;
+            id = new RecordId(
+                type.replaceAll(" ", "_"),
+                `${name.replaceAll(" ", "_")}_${Date.now()}`
+            );
         }
 
         for (let property in body) {
@@ -57,10 +62,7 @@ const externalRequest = async (
                  FOR create, update, delete WHERE created_by = $auth.id OR $auth.admin = true;
              `);
         }
-
-        await db.invalidate();
-        await db.authenticate(authentication);
-        await db.use({ ns: "test", db: "test" });
+        console.log(body);
         await db.create(id, body);
 
         return { message: "Success", id };
@@ -73,33 +75,32 @@ const externalRequest = async (
 
         async function relateObj(obj: request) {
             if (!obj.type || !obj.name) return;
-            let objID = `${obj.type.replaceAll(" ", "_")}:${obj.name.replaceAll(
-                " ",
-                "_"
-            )}`;
+            let objID = new RecordId(
+                obj.type.replaceAll(" ", "_"),
+                obj.name.replaceAll(" ", "_")
+            );
             obj.id = objID;
 
-            const [result] = await db.select(objID);
+            const result = await db.select(objID);
 
             if (!result) {
-                let [tableQuery] = await db.select(
-                    obj.type.replaceAll(" ", "_")
-                );
+                let [tableQuery] = await db.select(objID.tb);
                 await db.create(objID, { name: obj.name, created_by: ID });
                 if (!tableQuery) {
                     await db.query(`
-                    DEFINE TABLE ${obj.type.replaceAll(" ", "_")} SCHEMALESS
+                    DEFINE TABLE ${objID.tb} SCHEMALESS
                         PERMISSIONS
                         FOR select WHERE true
                         FOR create, update, delete WHERE created_by = $auth.id OR $auth.admin = true;
                     `);
                 }
             }
-            await db.query(`RELATE ${id}->made_of->${objID}`);
+            await db.query(
+                `RELATE ${id.tb}:${id.id}->made_of->${objID.tb}:${objID.id}`
+            );
         }
     } catch (e: any) {
-        console.error("ERROR", e);
-        return { message: "Error", e: e.message };
+        return new Error(e.message);
     }
 };
 

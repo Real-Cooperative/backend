@@ -7,7 +7,7 @@
         "start": "NODE_ENV=production tsx index.ts",
         "dev": "NODE_ENV=development tsx index.ts",
         "test": "jest --watchAll --verbose --forceExit --detectOpenHandles",
-        "surreal": "surreal start --log debug --user root --pass root memory & surreal import --conn http://localhost:8000 --user root --pass root --ns test --db test user.surql"
+        "surreal": "surreal start --log debug --auth --user root --pass root file://surreal.db & surreal import --conn http://localhost:8000 --user root --pass root --ns rciad --db prod user.surql"
     },
     "keywords": [],
     "author": "",
@@ -20,7 +20,7 @@
         "dotenv": "^16.3.1",
         "formidable": "^3.4.0",
         "nodemon": "^2.0.22",
-        "surrealdb.js": "^0.8.2",
+        "surrealdb.js": "^1.0.0-beta.6",
         "typescript": "^5.1.6"
     },
     "type": "module",

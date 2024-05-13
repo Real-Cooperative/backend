@@ -19,7 +19,6 @@ type headers = http.IncomingHttpHeaders & {
 type message =
     | {
           message: string;
-          e?: Error;
           status?: string;
           details?: any;
       }
@@ -27,7 +26,8 @@ type message =
     | {
           page: {};
           count: number;
-      };
+      }
+    | Error;
 
 type routeFunction = (
     body: any,

@@ -15,70 +15,107 @@ dotenv.config();
 const PORT = process.env.PORT || 4000;
 const whiteList = process.env.WHITE_LIST || "http://localhost:3000";
 
-const db = new Surreal(process.env.SURREAL_DB || "http://localhost:8000/rpc");
+const db = new Surreal();
+const db_url = process.env.SURREAL_DB || "http://localhost:8000/rpc";
+const dbPass = process.env.SURREAL_PASS || "root";
+async function dbConnect(db: Surreal) {
+    console.log("Connecting to Surreal...");
+    await db.connect(db_url, {
+        auth: {
+            username: "root",
+            password: dbPass,
+        },
+        namespace: "rciad",
+        database: "prod",
+    });
+    console.log("Connected to Surreal");
+}
 
 type nodeRequest = app.IncomingMessage;
 type nodeResponse = app.ServerResponse<app.IncomingMessage> & {
     req: app.IncomingMessage;
 };
 
-const routes = {
-    "/api/v1/login": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, login, db),
+async function main() {
+    try {
+        await dbConnect(db);
 
-    "/api/v1/signup": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, signup, db),
+        const routes = {
+            "/api/v1/login": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, login, db),
 
-    "/api/v1/me": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, getMe, db),
+            "/api/v1/signup": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, signup, db),
 
-    "/api/v1/user": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, getUser, db),
+            "/api/v1/me": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, getMe, db),
 
-    "/api/v1/update-user": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, updateUser, db),
+            "/api/v1/user": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, getUser, db),
 
-    "/api/v1/post": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, post, db),
+            "/api/v1/update-user": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, updateUser, db),
 
-    "/api/v1/get": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, get, db),
+            "/api/v1/post": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, post, db),
 
-    "/api/v1/get-relation": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, getRelation, db),
+            "/api/v1/get": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, get, db),
 
-    "/api/v1/delete": (req: nodeRequest, res: nodeResponse) =>
-        use(req, res, delRecord, db),
+            "/api/v1/get-relation": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, getRelation, db),
 
-    "/": (req: nodeRequest, res: nodeResponse) => {
-        res.writeHead(200);
-        res.end("OK");
-    },
-};
+            "/api/v1/delete": (req: nodeRequest, res: nodeResponse) =>
+                use(req, res, delRecord, db),
 
-const server = app.createServer(async (req, res) => {
-    res.setHeader("Access-Control-Allow-Origin", whiteList);
+            "/": (req: nodeRequest, res: nodeResponse) => {
+                res.writeHead(200);
+                res.end("OK");
+            },
+        };
 
-    res.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PATCH");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    res.setHeader("Access-Control-Max-Age", 86400);
-    res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Authentication, X-RCIAD-Requested-ID, x-rciad-requested-user, x-rciad-page, x-rciad-limit, x-rciad-requested-relation, x-rciad-subscribed"
-    );
+        const server = app.createServer(async (req, res) => {
+            try {
+                res.setHeader("Access-Control-Allow-Origin", whiteList);
 
-    if (req.url && req.url in routes) {
-        return routes[req.url as keyof typeof routes](req, res);
-    } else {
-        res.statusCode = 404;
-        res.end("Route Not Found");
+                res.setHeader(
+                    "Access-Control-Allow-Methods",
+                    "POST, GET, DELETE, PATCH"
+                );
+                res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+                res.setHeader("Access-Control-Max-Age", 86400);
+                res.setHeader(
+                    "Access-Control-Allow-Headers",
+                    "Authentication, X-RCIAD-Requested-ID, x-rciad-requested-user, x-rciad-page, x-rciad-limit, x-rciad-requested-relation, x-rciad-subscribed"
+                );
+
+                if (req.url && req.url in routes) {
+                    if (req.method === "OPTIONS") {
+                        res.writeHead(200);
+                        res.end();
+                        return;
+                    }
+                    return routes[req.url as keyof typeof routes](req, res);
+                } else {
+                    res.statusCode = 404;
+                    res.end("Route Not Found");
+                }
+            } catch (e: any) {
+                res.statusCode = 500;
+                res.end(e.message);
+            }
+        });
+
+        server.listen(PORT, () => {
+            console.log(`Server listening on port ${PORT}`);
+        });
+
+        server.on("error", (err) => {
+            console.error(err);
+        });
+    } catch (e: any) {
+        console.error(e);
     }
-});
+}
 
-server.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-});
-
-server.on("error", (err) => {
-    console.error(err);
-});
+main();

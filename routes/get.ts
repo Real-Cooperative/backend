@@ -4,6 +4,7 @@ import { Surreal, headers } from "./routes";
 dotenv.config();
 
 const dbPass = process.env.SURREAL_PASS || "root";
+const db_url = process.env.SURREAL_DB || "http://localhost:8000/rpc";
 
 type request = {
     [key: string]: any;
@@ -32,9 +33,6 @@ const externalRequest = async (
             count: 0,
         };
 
-        await db.signin({ user: "root", pass: dbPass });
-        await db.use({ ns: "test", db: "test" });
-
         type page = {
             [key: string]: any;
         };
@@ -42,27 +40,29 @@ const externalRequest = async (
         let pageQuery = await db.query<[page[]]>(
             `SELECT * FROM ${id} WHERE ${
                 user
-                    ? "created_by = " + user
+                    ? "created_by = s'" + user + "'"
                     : subscribed
-                    ? "created_by = " + subscribed
+                    ? "created_by = s'" + subscribed + "'"
                     : "true"
             } ORDER created_at DESC LIMIT ${limitHeader} START ${
                 (pageHeader - 1) * limitHeader
             }`
         );
-        let pageResult = pageQuery[0].result ? pageQuery[0].result : undefined;
+
+        let pageResult = pageQuery ? pageQuery[0] : undefined;
         if (!pageResult) throw new Error("No results found");
         type user = {
-            user: string;
+            username: string;
         };
         await Promise.all(
             pageResult.map(async (item) => {
                 let authorQuery = await db.query<[user[]]>(
-                    `SELECT user FROM ${item.created_by}`
+                    `SELECT username FROM ${item.created_by}`
                 );
-                item.author = authorQuery[0].result
-                    ? authorQuery[0].result[0].user
-                    : "Anonymous";
+                item.author =
+                    authorQuery[0] && authorQuery[0][0]
+                        ? authorQuery[0][0].username
+                        : "Anonymous";
             })
         );
 
@@ -74,18 +74,17 @@ const externalRequest = async (
         let countQuery = await db.query<[count[]]>(
             `SELECT count() FROM ${id} WHERE ${
                 user
-                    ? "created_by = " + user
+                    ? "created_by = s'" + user + "'"
                     : subscribed
-                    ? "created_by = " + subscribed
+                    ? "created_by = s'" + subscribed + "'"
                     : "true"
             } GROUP ALL`
         );
-        data.count = countQuery?.[0]?.result?.[0]
-            ? countQuery[0].result[0].count
-            : 0;
+        data.count =
+            countQuery[0] && countQuery[0][0] ? countQuery[0][0].count : 0;
         return data;
     } catch (e: any) {
-        return { status: "Error", message: e.message };
+        return new Error(e.message);
     }
 };
 
